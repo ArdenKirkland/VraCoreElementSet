@@ -8,6 +8,7 @@
  * @version    $Id:$
  * @package VraCoreElementSet
  * @author Ethan Gruber: ewg4x at virginia dot edu
+ * modified by Arden Kirkland, 2012
  **/
 
 add_plugin_hook('install', 'vra_core_install');
@@ -78,8 +79,20 @@ function vra_core_install()
 	        'data_type_id'   => 2
 	    ),
 		array(
-	    	'name'           => 'Location',
+	    	'name'           => 'Location:Creation',
+	        'description'    => 'The geographic location and/or name of the repository, building, site, or other entity where the Work or Image was first created.',
+	        'record_type_id' => 2,
+	        'data_type_id'   => 2
+	    ),
+	    array(
+	    	'name'           => 'Location:Repository',
 	        'description'    => 'The geographic location and/or name of the repository, building, site, or other entity whose boundaries include the Work or Image.',
+	        'record_type_id' => 2,
+	        'data_type_id'   => 2
+	    ),
+	    array(
+	    	'name'           => 'Location:Repository:RefID',
+	        'description'    => 'The accession number for the Work or Image at the repository, building, site, or other entity whose boundaries include the Work or Image.',
 	        'record_type_id' => 2,
 	        'data_type_id'   => 2
 	    ),
@@ -150,8 +163,14 @@ function vra_core_install()
 	        'data_type_id'   => 2
 	    ),
 	    array(
+	    	'name'           => 'Work Collection or Image',
+	        'description'    => 'Identifies if the item being described in the record is a WORK, COLLECTION, or IMAGE.',
+	        'record_type_id' => 2,
+	        'data_type_id'   => 2
+	    ),
+	    array(
 	    	'name'           => 'Identifier',
-	        'description'    => 'Equivalent of the refid attribute that holds the local unique identifier for the work described by the element set',
+	        'description'    => 'The unique record number of the WORK, COLLECTION, or IMAGE being described in the record.',
 	        'record_type_id' => 2,
 	        'data_type_id'   => 2
 	    ),
@@ -182,9 +201,9 @@ function vra_core_after_insert_item($item){
 	$vraCoreElements = $item->getElementsBySetName('VRA Core');
 	//crosswalk mapping from http://www.getty.edu/research/conducting_research/standards/intrometadata/crosswalks.html		
 	$crosswalk = array('Worktype'=>'Type', 'Subject'=>'Subject', 'Title'=>'Title', 'Agent'=>'Creator',
-						'Date'=>'Date', 'Location'=>'Coverage', 'Style Period'=>'Subject',
-						'Measurements'=>'Format', 'Technique'=>'Format', 'Inscription'=>'Description',
-						'Description'=>'Description', 'Relation'=>'Relation', 'Rights'=>'Rights', 'Identifier'=>'Identifier');
+						'Date'=>'Date', 'Location:Creation'=>'Coverage', 'Location:Repository'=>'Coverage', 'Cultural Context'=>'Subject', 'Style Period'=>'Subject',
+						'Measurements'=>'Format', 'Technique'=>'Subject', 'Inscription'=>'Description', 'Material'=>'Format',
+						'Description'=>'Description', 'Relation'=>'Relation', 'Rights'=>'Rights', 'Source'=>'Source', 'Identifier'=>'Identifier');
 	
 	
 	$hasVraElements = has_vra_core_element_texts($item);
@@ -287,7 +306,7 @@ function render_vra_core_xml($item){
 						if ($elementName == 'Inscription' || $elementName == 'Rights'){
 							$xml .= '<text>' . xml_escape($v) . '</text>';
 						}
-						elseif ($elementName == 'Location' || $elementName == 'Source' || $elementName == 'Textref' || $elementName == 'State Edition'){
+						elseif ($elementName == 'Location:Creation' || $elementName == 'Location:Repository' || $elementName == 'Location:Repository:RefID' || $elementName == 'Source' || $elementName == 'Textref' || $elementName == 'State Edition'){
 							$xml .= '<name>' . xml_escape($v) . '</name>';
 						}
 						elseif ($elementName == 'Subject'){
